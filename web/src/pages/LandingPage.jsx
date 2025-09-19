@@ -1,67 +1,87 @@
-import { Box, Typography } from '@mui/material';
-import InkFindersBackground from '../assets/InkFindersBackground.jpg';
-import InkFindersLogo from '../assets/InkFindersLogo.png';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid2';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import TextField from '@mui/material/TextField';
+
+const theme = createTheme({
+  typography: {
+    fontFamily: ['Inter, sans-serif'].join(','),
+    h1: { fontWeight: 800 },
+    h2: { fontWeight: 800 },
+    h3: { fontWeight: 800 },
+  },
+  shape: { borderRadius: 18 },
+  palette: {
+    mode: 'light',
+    primary: { main: '#40C9A2' },
+    secondary: { main: '#2F9C95' },
+    success: { main: '#7EDDD4' },
+    background: {
+      default: '#E6FAF7',
+      paper: '#E6FAF7',
+    },
+    text: { primary: '#1B1B1B' },
+  },
+});
 
 const LandingPage = () => {
   return (
-    <Box
-      sx={{
-        height: '100vh',
-        width: '100vw',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <Box
-        component="img"
-        src={InkFindersBackground}
-        alt="Background"
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          zIndex: -1,
-        }}
-      />
-      <Box
-        sx={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-        }}
-      >
-        <Box
-          component="img"
-          src={InkFindersLogo}
-          alt="Logo"
-          sx={{ width: 150, height: 150, mb: 2 }}
-        />
-        <Typography
-          variant="h2"
-          component="h1"
-          sx={{
-            fontWeight: 'bold',
-            color: 'white',
-            textShadow: '2px 2px 8px rgba(0,0,0,0.6)',
-          }}
-        >
-          InkFinders
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="md" sx={{ py: 8 }}>
+        <Typography variant="h2" gutterBottom>
+          Explora, guarda, relee. Haz Match cn tu próxima lectura.
         </Typography>
-        <Typography
-          variant="h5"
-          component="h2"
-          sx={{ fontWeight: 'bold', color: 'white' }}
-        >
-          Look for your favorite books
+        <Typography color="text.secundary" sx={{ mb: 3 }}>
+          Regístrate, crea tu perfil y organiza tus libros en <b>favoritos</b>,{' '}
+          <b>por leer</b> y <b>leídos</b>
         </Typography>
-      </Box>
-    </Box>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <TextField placeholder="Tu email" size="small" />
+          <Button variant="contained">Crear cuenta</Button>
+        </Box>
+      </Container>
+
+      <Container maxWidth="md" sx={{ py: 6 }}>
+        <Grid container spacing={2}>
+          <Grid xs={12} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h3">Perfiles</Typography>
+                <Typography color="text.secondary">
+                  Muestra tus géneros y autores favoritos.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid xs={12} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6">Favoritos</Typography>
+                <Typography color="text.secondary">
+                  Guarda los libros que más te gustan.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid xs={12} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6">Listas</Typography>
+                <Typography color="text.secondary">
+                  Libros que te quieres leer en un futuro y libros de los que ya
+                  has disfrutado.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
+    </ThemeProvider>
   );
 };
 

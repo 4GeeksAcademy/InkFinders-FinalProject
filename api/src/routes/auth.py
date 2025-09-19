@@ -1,8 +1,6 @@
 from src.db import db
 from flask import request, jsonify
-from ..models.models import Users
-
-# from api.src.models.models import Users
+from src.models.models import Users
 from sqlalchemy import or_
 import bcrypt
 from flask_jwt_extended import (

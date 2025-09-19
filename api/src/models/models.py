@@ -85,7 +85,7 @@ class UserBookStatus(db.Model):
         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
     book_id: Mapped[str] = mapped_column(
-        ForeignKey("books.id", ondelete="CASCADE"), String(64), primary_key=True
+        ForeignKey("books.id", ondelete="CASCADE"), primary_key=True
     )
 
     status: Mapped[BookStatusEnum] = mapped_column(

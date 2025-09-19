@@ -1,7 +1,7 @@
 import os
 from src.db import db
 from flask_admin import Admin
-from api.src.models.models import Users
+from src.models.models import Users
 from src.admin.model_wrapper import StandardModelView
 
 
