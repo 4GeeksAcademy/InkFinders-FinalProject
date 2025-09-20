@@ -23,7 +23,7 @@ export const App = () => {
                 <Route
                   key={route.name}
                   path={route.path}
-                  element={route.component}
+                  element={route.element}
                 />
               );
             })}

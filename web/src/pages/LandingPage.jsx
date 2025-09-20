@@ -1,9 +1,6 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Box from '@mui/material/Box';
 import logo from '/workspaces/InkFinders-FinalProject/web/src/assets/Inkfinders_Book_Club_Logo-removebg-preview.png';
 
@@ -47,7 +44,7 @@ const LandingPage = () => {
           Explora, guarda, relee.
         </Typography>
         <Typography variant="h2" gutterBottom>
-          Haz Match cn tu próxima lectura.
+          Haz Match con tu próxima lectura.
         </Typography>
         <Typography color="secondary" sx={{ mb: 3 }}>
           Regístrate, crea tu perfil y organiza tus libros en <b>favoritos</b>,{' '}

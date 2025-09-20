@@ -17,10 +17,11 @@ const theme = createTheme({
     success: { main: '#7EDDD4' },
     background: {
       default: '#E6FAF7',
-      paper: '#E6FAF7',
+      paper: '#ffffffff',
     },
     text: {
       primary: '#1B1B1B',
+      secondary: '#5E6A6A',
     },
   },
   components: {

@@ -1,20 +1,26 @@
 import { Home } from '../../pages/HomePage';
 import { Login } from '../../pages/LoginPage';
+import Leidos from '../../pages/LeidosPage';
+import PorLeer from '../../pages/PorLeerPage';
+import Favoritos from '../../pages/FavoritePage';
 
 export const routesConfig = [
   {
     name: 'Root',
     path: '/',
-    component: <Home />,
+    element: <Home />,
   },
   {
     name: 'Login',
     path: '/login',
-    component: <Login />,
+    element: <Login />,
   },
   {
     name: 'All',
     path: '*',
-    component: <Home />,
+    element: <Home />,
   },
+  { name: 'Favoritos', path: '/favoritos', element: <Favoritos /> },
+  { name: 'Leídos', path: '/leidos', element: <Leidos /> },
+  { name: 'Por Leer', path: '/por-leer', element: <PorLeer /> },
 ];
