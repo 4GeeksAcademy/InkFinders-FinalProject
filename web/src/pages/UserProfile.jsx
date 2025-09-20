@@ -2,7 +2,9 @@
 import { Link } from 'react-router-dom';
 import './UserProfile.css';
 
-const UserProfile = () => {
+const UserProfile = ({ user }) => {
+  if (!user) return <p>No hay usuario cargado</p>;
+
   return (
     <div className="UserProfile-container">
       <div className="main-content">
@@ -14,8 +16,9 @@ const UserProfile = () => {
               </div>
               <div className="profile-details">
                 <h2>Perfil Usuario</h2>
-                <p className="profile-item">:</p>
-                <p className="profile-item">Descripcion</p>
+                <p className="profile-item">Nick: {book.user_name}</p>
+                <p className="profile-item">Email: {user.email}</p>
+                <p className="profile-item">Descripcion: {user.description}</p>
                 <div className="rating">
                   <span className="score">97</span>
                   <span className="star">💎</span>
