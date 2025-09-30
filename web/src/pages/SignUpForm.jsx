@@ -31,7 +31,7 @@ const SignUpForm = () => {
             fullWidth
             margin="normal"
             label="Email"
-            ame="email"
+            name="email"
             required
           />
           <TextField
@@ -42,7 +42,7 @@ const SignUpForm = () => {
             name="password"
             required
           />
-          <Button f ullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
+          <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
             Registrarse
           </Button>
         </form>
