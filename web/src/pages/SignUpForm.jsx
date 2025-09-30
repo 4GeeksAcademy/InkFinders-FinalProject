@@ -42,7 +42,7 @@ const SignUpForm = () => {
             name="password"
             required
           />
-          <Button f ullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
+          <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
             Registrarse
           </Button>
         </form>
