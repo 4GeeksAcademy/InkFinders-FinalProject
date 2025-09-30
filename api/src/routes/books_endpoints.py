@@ -5,10 +5,12 @@ from src.repository.book_repository import (
     upsert_book,
     unset_user_book_status,
 )
+import sys
 from src.models.models import db, Users, Book, UserBookStatus, BookStatusEnum
 from src.services.google_books_client import get_volume
 from flask_jwt_extended import (
     jwt_required,
+    get_jwt_identity,
 )  # Extensión de Flask para JWT: control de acceso por token.
 
 
@@ -20,6 +22,18 @@ def get_current_user() -> Users:
     if not user:
         abort(400, description=f"Usuario con id={uid} no existe")
     return user
+
+
+def get_favorite_books(user_id: int):
+    stmt = (
+        select(Book)
+        .join(UserBookStatus, UserBookStatus.book_id == Book.id)
+        .where(
+            UserBookStatus.user_id == user_id,
+            UserBookStatus.status == BookStatusEnum.favorite,
+        )
+    )
+    return db.session.scalars(stmt).all()
 
 
 def ensure_book(book_id: str) -> Book:
@@ -71,6 +85,14 @@ def register_book_endpoints(app):
                 "info_link": book.info_link,
             }
         ), 201
+
+    @app.route("/favorites/get_books", methods=["GET"])
+    @jwt_required()
+    def get_all_my_favorites():
+        user = get_current_user()
+        fav_books = get_favorite_books(user.id)
+
+        return jsonify([b.serialize() for b in fav_books]), 200
 
     @app.route("/favorites/add_book/<string:book_id>", methods=["POST"])
     @jwt_required()

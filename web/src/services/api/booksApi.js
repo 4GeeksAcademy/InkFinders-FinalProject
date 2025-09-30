@@ -18,60 +18,92 @@ export function mapVolumeToCard(v) {
     authors: vi.authors || [],
   };
 }
-/*
-export async function searchBooks(q, startIndex = 0, maxResults = 20) {
-  const url = new URL("/gbooks/volumes", BASE);
-  url.searchParams.set("q", q);
-  url.searchParams.set("startIndex", String(startIndex)); // paginación
-  url.searchParams.set("maxResults", String(maxResults)); // Google permite hasta 40
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`GoogleBooks proxy ${res.status}`);
-  const json = await res.json();
-  return (json.items || []).map(mapVolumeToCard);
-}
-*/
 
-export async function searchBooks(q, maxResults = 20) {
-  return await fetchWrapper(
-    `${baseUrl}gbooks/search?q=${q}&maxResults=${maxResults}`,
-    {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then((data) => {
+export async function searchBooks(q) {
+  return await fetchWrapper(`${baseUrl}gbooks/search?q=${q}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((data) => {
     return data;
   });
 }
 
-export async function setBookStatus(volumeId, status) {
+export const setBookStatus = async (volumeId, status) => {
   const path =
     status === 'favorite'
-      ? '/favorite/book/'
+      ? 'favorites/add_book/'
       : status === 'to_read'
-        ? '/to_read/book/'
-        : '/read/book/';
-  const res = await fetch(`${BASE}${path}${volumeId}`, {
+        ? 'to_read/add_book/'
+        : 'read/add_book/';
+  return await fetchWrapper(`${baseUrl}${path}${volumeId}`, {
     method: 'POST',
-    headers: { 'X-User-Id': getUserId(), 'Content-Type': 'application/json' },
+    credentials: 'include',
+  }).then((data) => {
+    return data;
+  });
+};
+
+export const unsetBookStatus = async (volumeId, status) => {
+  const path =
+    status === 'favorite'
+      ? 'favorites/delete_book/'
+      : status === 'to_read'
+        ? 'to_read/delete_book/'
+        : 'read/delete_book/';
+  return await fetchWrapper(`${baseUrl}${path}${volumeId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  }).then((data) => {
+    return data;
+  });
+};
+export async function setBookStatus2(volumeId, status) {
+  const path =
+    status === 'favorite'
+      ? 'favorites/add_book/'
+      : status === 'to_read'
+        ? 'to_read/add_book/'
+        : 'read/add_book/';
+  const res = await fetch(`${baseUrl}${path}${volumeId}`, {
+    method: 'POST',
+    credentials: 'include',
   });
   if (!res.ok) throw new Error(`setBookStatus ${status} -> ${res.status}`);
   return res.json();
 }
 
-export async function unsetBookStatus(volumeId, status) {
+export async function unsetBookStatus2(volumeId, status) {
   const path =
     status === 'favorite'
-      ? '/favorite/book/'
+      ? '/favorites/delete_book/'
       : status === 'to_read'
-        ? '/to_read/book/'
-        : '/read/book/';
+        ? '/to_read/delete_book/'
+        : '/read/delete_book/';
   const res = await fetch(`${BASE}${path}${volumeId}`, {
     method: 'DELETE',
-    headers: { 'X-User-Id': getUserId() },
+    credentials: 'include',
   });
   if (!res.ok) throw new Error(`unsetBookStatus ${status} -> ${res.status}`);
   return res.json();
+}
+
+export async function getBooksByStatus(status) {
+  const path =
+    status === 'favorite'
+      ? 'favorites/get_books'
+      : status === 'to_read'
+        ? 'to_read/get_books'
+        : 'read/get_books';
+  return await fetchWrapper(`${baseUrl}${path}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((data) => {
+    return data;
+  });
 }

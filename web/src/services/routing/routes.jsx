@@ -3,7 +3,7 @@ import { Login } from '../../pages/LoginPage';
 import Leidos from '../../pages/LeidosPage';
 import PorLeer from '../../pages/PorLeerPage';
 import Favoritos from '../../pages/FavoritePage';
-import SearchResults from '../../pages/searchResoultsPage';
+import SearchResults from '../../pages/searchResultsPage';
 
 export const routesConfig = [
   {
