@@ -14,16 +14,6 @@ from flask_jwt_extended import (
 )  # Extensión de Flask para JWT: control de acceso por token.
 
 
-def get_current_user() -> Users:
-    uid = request.headers.get("X-User-Id", "1")
-    if not uid.isdigit():
-        abort(400, description="X-User-Id debe ser numérico")
-    user = db.session.get(Users, int(uid))
-    if not user:
-        abort(400, description=f"Usuario con id={uid} no existe")
-    return user
-
-
 def get_favorite_books(user_id: int):
     stmt = (
         select(Book)
@@ -113,7 +103,8 @@ def register_book_endpoints(app):
     @app.route("/favorites/get_books", methods=["GET"])
     @jwt_required()
     def get_all_my_favorites():
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         fav_books = get_favorite_books(user.id)
 
         return jsonify([b.serialize() for b in fav_books]), 200
@@ -123,7 +114,8 @@ def register_book_endpoints(app):
     def add_fav_book(
         book_id: str,
     ):  # añadir un libro a favoritos del usuario actual. Si ya está agregado, devuelve 200.
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         book = ensure_book(book_id)
         exists = db.session.scalars(
             select(UserBookStatus).filter_by(
@@ -146,7 +138,8 @@ def register_book_endpoints(app):
     def remove_fav_book(
         book_id: str,
     ):
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         deleted = unset_user_book_status(user.id, book_id, BookStatusEnum.favorite)
 
         if deleted:
@@ -159,7 +152,8 @@ def register_book_endpoints(app):
     @app.route("/to_read/get_books", methods=["GET"])
     @jwt_required()
     def get_all_my_to_read():
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         to_read_books = get_to_read_books(user.id)
 
         return jsonify([b.serialize() for b in to_read_books]), 200
@@ -167,7 +161,8 @@ def register_book_endpoints(app):
     @app.route("/to_read/add_book/<string:book_id>", methods=["POST"])
     @jwt_required()
     def add_to_read_book(book_id: str):
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         if not isinstance(user, Users):
             return user
 
@@ -193,7 +188,8 @@ def register_book_endpoints(app):
     @app.route("/to_read/delete_book/<string:book_id>", methods=["DELETE"])
     @jwt_required()
     def remove_to_read_book(book_id: str):  # quita el libro de la lista de "para leer"
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         if not isinstance(user, Users):
             return user
 
@@ -208,7 +204,8 @@ def register_book_endpoints(app):
     @app.route("/read/get_books", methods=["GET"])
     @jwt_required()
     def get_all_my_read():
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         read_books = get_read_books(user.id)
 
         return jsonify([b.serialize() for b in read_books]), 200
@@ -216,7 +213,8 @@ def register_book_endpoints(app):
     @app.route("/read/add_book/<string:book_id>", methods=["POST"])
     @jwt_required()
     def add_read_book(book_id: str):
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         if not isinstance(user, Users):
             return user
 
@@ -240,7 +238,8 @@ def register_book_endpoints(app):
     @app.route("/read/delete_book/<string:book_id>", methods=["DELETE"])
     @jwt_required()
     def remove_read_book(book_id: str):  # quita el libro de la lista de "leídos"
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         if not isinstance(user, Users):
             return user
 
@@ -255,7 +254,8 @@ def register_book_endpoints(app):
     @app.route("/books/mine", methods=["GET"])
     @jwt_required()
     def list_my_books():
-        user = get_current_user()
+        user_id = get_jwt_identity()
+        user = Users.query.get(user_id)
         if not isinstance(user, Users):
             return user
 
