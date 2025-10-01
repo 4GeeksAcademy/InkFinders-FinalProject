@@ -71,6 +71,9 @@ class Book(db.Model):
         back_populates="book", cascade="all, delete-orphan", passive_deletes=True
     )
 
+    def serialize(self):
+        return {"id": self.id, "title": self.title, "authors": self.authors_json}
+
 
 class BookStatusEnum(Enum):
     favorite = "favorite"
@@ -105,3 +108,6 @@ class UserBookStatus(db.Model):
     book: Mapped[Book] = relationship(back_populates="user_links")
 
     __table_args__ = (Index("ix_user_status", "user_id", "status"),)
+
+    def serialize(self):
+        return {"user_id": self.user_id, "book_id": self.book_id, "status": self.status}

@@ -11,7 +11,7 @@ const LandingPage = () => {
         src={logo}
         alt="InkFinders Logo"
         sx={{
-          height: 200,
+          height: 300,
           width: 'auto',
           display: 'block',
           justifySelf: 'center',

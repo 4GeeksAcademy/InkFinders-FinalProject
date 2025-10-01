@@ -5,10 +5,12 @@ from src.repository.book_repository import (
     upsert_book,
     unset_user_book_status,
 )
+import sys
 from src.models.models import db, Users, Book, UserBookStatus, BookStatusEnum
 from src.services.google_books_client import get_volume
 from flask_jwt_extended import (
     jwt_required,
+    get_jwt_identity,
 )  # Extensión de Flask para JWT: control de acceso por token.
 
 
@@ -20,6 +22,42 @@ def get_current_user() -> Users:
     if not user:
         abort(400, description=f"Usuario con id={uid} no existe")
     return user
+
+
+def get_favorite_books(user_id: int):
+    stmt = (
+        select(Book)
+        .join(UserBookStatus, UserBookStatus.book_id == Book.id)
+        .where(
+            UserBookStatus.user_id == user_id,
+            UserBookStatus.status == BookStatusEnum.favorite,
+        )
+    )
+    return db.session.scalars(stmt).all()
+
+
+def get_to_read_books(user_id: int):
+    stmt = (
+        select(Book)
+        .join(UserBookStatus, UserBookStatus.book_id == Book.id)
+        .where(
+            UserBookStatus.user_id == user_id,
+            UserBookStatus.status == BookStatusEnum.to_read,
+        )
+    )
+    return db.session.scalars(stmt).all()
+
+
+def get_read_books(user_id: int):
+    stmt = (
+        select(Book)
+        .join(UserBookStatus, UserBookStatus.book_id == Book.id)
+        .where(
+            UserBookStatus.user_id == user_id,
+            UserBookStatus.status == BookStatusEnum.read,
+        )
+    )
+    return db.session.scalars(stmt).all()
 
 
 def ensure_book(book_id: str) -> Book:
@@ -40,8 +78,6 @@ def serialize_link(
         "user_id": link.user_id,
         "book_id": link.book_id,
         "status": link.status.value,
-        # "note": link.note,
-        # "rating": link.rating,
         "title": book.title,
         "authors": book.authors_json or [],
         "thumbnail": book.thumbnail,
@@ -72,6 +108,16 @@ def register_book_endpoints(app):
             }
         ), 201
 
+    # FAVORITOS
+
+    @app.route("/favorites/get_books", methods=["GET"])
+    @jwt_required()
+    def get_all_my_favorites():
+        user = get_current_user()
+        fav_books = get_favorite_books(user.id)
+
+        return jsonify([b.serialize() for b in fav_books]), 200
+
     @app.route("/favorites/add_book/<string:book_id>", methods=["POST"])
     @jwt_required()
     def add_fav_book(
@@ -99,7 +145,7 @@ def register_book_endpoints(app):
     @jwt_required()
     def remove_fav_book(
         book_id: str,
-    ):  # quitamos un libro de la lista de favoritos actual
+    ):
         user = get_current_user()
         deleted = unset_user_book_status(user.id, book_id, BookStatusEnum.favorite)
 
@@ -109,6 +155,15 @@ def register_book_endpoints(app):
             return jsonify({"message": "No estaba en favoritos (sin cambios)"}), 200
 
     # TO READ
+
+    @app.route("/to_read/get_books", methods=["GET"])
+    @jwt_required()
+    def get_all_my_to_read():
+        user = get_current_user()
+        to_read_books = get_to_read_books(user.id)
+
+        return jsonify([b.serialize() for b in to_read_books]), 200
+
     @app.route("/to_read/add_book/<string:book_id>", methods=["POST"])
     @jwt_required()
     def add_to_read_book(book_id: str):
@@ -124,7 +179,9 @@ def register_book_endpoints(app):
             )
         ).first()
         if exists:
-            return jsonify({"message": "Ya estaba en tu lista de libros por Leer"}), 200
+            return jsonify(
+                {"message": "Ya estaba en tu lista de libros pendientes"}
+            ), 200
 
         link = UserBookStatus(
             user_id=user.id, book_id=book.id, status=BookStatusEnum.to_read
@@ -147,10 +204,18 @@ def register_book_endpoints(app):
         else:
             return jsonify({"message": "No estaba en pendientes (sin cambios)"}), 200
 
-    # READ
+    ## READ
+    @app.route("/read/get_books", methods=["GET"])
+    @jwt_required()
+    def get_all_my_read():
+        user = get_current_user()
+        read_books = get_read_books(user.id)
+
+        return jsonify([b.serialize() for b in read_books]), 200
+
     @app.route("/read/add_book/<string:book_id>", methods=["POST"])
     @jwt_required()
-    def add_read_book(book_id: str):  # marcamos el libro como "leído"
+    def add_read_book(book_id: str):
         user = get_current_user()
         if not isinstance(user, Users):
             return user
@@ -163,19 +228,18 @@ def register_book_endpoints(app):
             )
         ).first()
         if exists:
-            return jsonify({"message": "Ya estaba en 'leído'"}), 200
+            return jsonify({"message": "Ya estaba en tu lista de libros leídos"}), 200
 
         link = UserBookStatus(
             user_id=user.id, book_id=book.id, status=BookStatusEnum.read
         )
-
         db.session.add(link)
         db.session.commit()
         return jsonify(serialize_link(link, book)), 201
 
     @app.route("/read/delete_book/<string:book_id>", methods=["DELETE"])
     @jwt_required()
-    def remove_read_book(book_id: str):  # quitamos el estado de "leído" para el libro.
+    def remove_read_book(book_id: str):  # quita el libro de la lista de "leídos"
         user = get_current_user()
         if not isinstance(user, Users):
             return user
