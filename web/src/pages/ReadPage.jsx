@@ -1,10 +1,10 @@
 import { Container, Typography } from '@mui/material';
-import FavoriteCard from '../components/FavoriteCard';
+import ToReadCard from '../components/ReadStatusCard';
 import Grid from '@mui/material/Grid2';
 import { getBooksByStatus } from '../services/api/booksApi';
 import { useEffect, useState } from 'react';
 
-export default function FavoritesPage() {
+export default function ReadPage() {
   const [books, setBooks] = useState([]); // siempre array, gracias
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,17 +14,17 @@ export default function FavoritesPage() {
     setLoading(true);
     (async () => {
       try {
-        const data = await getBooksByStatus('favorite');
+        const data = await getBooksByStatus('read');
         console.log('getBookByStatus');
         console.log(data);
         // Acepta tanto lista directa como { items: [...] }
         const raw = Array.isArray(data) ? data : (data?.items ?? []);
-        const list = raw.map((item) => ({ ...item, favorite: true }));
-
+        const list = raw.map((item) => ({ ...item, read: true }));
+        console.log(list);
         if (!cancel) setBooks(list);
       } catch (e) {
         if (!cancel)
-          setError(e?.message || 'No se pudieron cargar tus favoritos');
+          setError(e?.message || 'No se pudieron cargar tus libros leídos');
       } finally {
         if (!cancel) setLoading(false);
       }
@@ -34,23 +34,20 @@ export default function FavoritesPage() {
       cancel = true;
     };
   }, []);
-
-  console.log(books);
-
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" fontWeight={800} gutterBottom>
-        Mis favoritos
+        Leídos
       </Typography>
       {books.length === 0 ? (
         <Typography color="text.secondary">
-          Pulsa ⭐ en una card para añadirla.
+          Marca un libro con ✔ para verlo aquí.
         </Typography>
       ) : (
         <Grid container spacing={2}>
           {books.map((b) => (
             <Grid key={b.id} xs={12} sm={6} md={3}>
-              <FavoriteCard {...b} />
+              <ToReadCard {...b} />
             </Grid>
           ))}
         </Grid>

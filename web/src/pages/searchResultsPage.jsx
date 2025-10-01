@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import CardBook from '../components/BooksCard';
+import CardBook from '../components/SearchCard';
 import { searchBooks, getBooksByStatus } from '../services/api/booksApi';
 
 export default function SearchResults() {
@@ -13,7 +13,7 @@ export default function SearchResults() {
 
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
-  const [items, setItems] = useState([]); // ⬅️ SIEMPRE array
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     if (!q) return;
@@ -23,14 +23,29 @@ export default function SearchResults() {
         setLoading(true);
 
         // Haz las dos llamadas en paralelo
-        const [datafav, data] = await Promise.all([
+        const [datatoreads, datafav, datareads, data] = await Promise.all([
+          getBooksByStatus('to_read'),
           getBooksByStatus('favorite'),
+          getBooksByStatus('read'),
           searchBooks(q, 20),
         ]);
 
         // Set de IDs favoritos (soporta {id} o {book:{id}})
         const favIds = new Set(
           (Array.isArray(datafav) ? datafav : (datafav?.items ?? []))
+            .map((x) => x.book?.id ?? x.id)
+            .filter(Boolean)
+        );
+        const toReadIds = new Set(
+          (Array.isArray(datatoreads)
+            ? datatoreads
+            : (datatoreads?.items ?? [])
+          )
+            .map((x) => x.book?.id ?? x.id)
+            .filter(Boolean)
+        );
+        const readIds = new Set(
+          (Array.isArray(datareads) ? datareads : (datareads?.items ?? []))
             .map((x) => x.book?.id ?? x.id)
             .filter(Boolean)
         );
@@ -48,6 +63,8 @@ export default function SearchResults() {
               v.imageLinks?.smallThumbnail ??
               '/InkFindersBackground.jpg',
             favorite: favIds.has(item.id),
+            to_read: toReadIds.has(item.id),
+            read: readIds.has(item.id),
           };
         });
 

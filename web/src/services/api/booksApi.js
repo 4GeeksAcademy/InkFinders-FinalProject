@@ -1,11 +1,5 @@
 import { baseUrl, fetchWrapper } from './config';
 
-const BASE = import.meta.env?.VITE_API_BASE || 'http://127.0.0.1:5000';
-
-function getUserId() {
-  return localStorage.getItem('userId') || '1';
-}
-
 const fixCover = (u) => (u ? u.replace(/^http:/, 'https:') : undefined);
 
 export function mapVolumeToCard(v) {
@@ -60,35 +54,6 @@ export const unsetBookStatus = async (volumeId, status) => {
     return data;
   });
 };
-export async function setBookStatus2(volumeId, status) {
-  const path =
-    status === 'favorite'
-      ? 'favorites/add_book/'
-      : status === 'to_read'
-        ? 'to_read/add_book/'
-        : 'read/add_book/';
-  const res = await fetch(`${baseUrl}${path}${volumeId}`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-  if (!res.ok) throw new Error(`setBookStatus ${status} -> ${res.status}`);
-  return res.json();
-}
-
-export async function unsetBookStatus2(volumeId, status) {
-  const path =
-    status === 'favorite'
-      ? '/favorites/delete_book/'
-      : status === 'to_read'
-        ? '/to_read/delete_book/'
-        : '/read/delete_book/';
-  const res = await fetch(`${BASE}${path}${volumeId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-  });
-  if (!res.ok) throw new Error(`unsetBookStatus ${status} -> ${res.status}`);
-  return res.json();
-}
 
 export async function getBooksByStatus(status) {
   const path =

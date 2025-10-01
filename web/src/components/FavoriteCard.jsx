@@ -9,12 +9,11 @@ import {
   Stack,
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router';
-import { useLibrary } from '../context/Library';
 import PropTypes from 'prop-types';
 import { setBookStatus, unsetBookStatus } from '../services/api/booksApi';
 import { useState, useEffect } from 'react';
 
-CardBook.propTypes = {
+FavoriteCard.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string,
   cover: PropTypes.string,
@@ -24,24 +23,21 @@ CardBook.propTypes = {
   ]),
   favorite: PropTypes.bool,
 };
-CardBook.defaultProps = {
+FavoriteCard.defaultProps = {
   title: 'Título desconocido',
   cover: '/InkFindersBackground.jpg',
   authors: 'Autor desconocido',
   favorite: false,
 };
 
-export default function CardBook({ id, title, cover, authors, favorite }) {
-  const { getStatus, setStatus } = useLibrary();
-
+export default function FavoriteCard({ id, title, cover, authors, favorite }) {
   const authorsText = Array.isArray(authors)
     ? authors.join(', ')
     : authors || 'Autor desconocido';
   const coverSrc = cover || '/InkFindersBackground.jpg';
   const book = { id, title, cover: coverSrc, authors, favorite };
   const [fav, setFav] = useState(book.favorite);
-  const [savingFav, setSavingFav, setFavoriteFlag] = useState(false);
-  const status = getStatus(id);
+  const [savingFav, setSavingFav] = useState(false);
 
   const handleToggleFavorite = async () => {
     if (savingFav) return; // evita múltiples clics
@@ -116,24 +112,6 @@ export default function CardBook({ id, title, cover, authors, favorite }) {
             aria-busy={savingFav}
           >
             {savingFav ? '⏳' : fav ? '💛' : '⭐'}
-          </Button>
-          <Button
-            onClick={() =>
-              setStatus(book, status === 'to_read' ? 'none' : 'to_read')
-            }
-            title="Para leer"
-            aria-label="Para leer"
-            variant={status === 'to_read' ? 'contained' : 'outlined'}
-          >
-            📚
-          </Button>
-          <Button
-            onClick={() => setStatus(book, status === 'read' ? 'none' : 'read')}
-            title="Leído"
-            aria-label="Leído"
-            variant={status === 'read' ? 'contained' : 'outlined'}
-          >
-            ✔
           </Button>
         </ButtonGroup>
       </Stack>
