@@ -1,5 +1,12 @@
 import { useState, useContext } from 'react';
-import { Drawer, Box, TextField, Typography, IconButton } from '@mui/material';
+import {
+  Drawer,
+  Box,
+  TextField,
+  Typography,
+  IconButton,
+  Button,
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { UserContext } from '../context/User';
 import { isEmpty } from 'lodash';
@@ -30,19 +37,21 @@ function Sidebar() {
 
   return (
     <div>
-      <IconButton
-        onClick={toggleDrawer}
-        sx={{
-          position: 'fixed',
-          top: 100,
-          right: 20,
-          zIndex: 1300,
-          backgroundColor: '#40C9A2',
-          color: '#1b1b1b',
-        }}
-      >
-        <SearchIcon />
-      </IconButton>
+      {!isOpen && (
+        <IconButton
+          onClick={toggleDrawer}
+          sx={{
+            position: 'fixed',
+            top: 100,
+            right: 20,
+            zIndex: 1300,
+            backgroundColor: '#40C9A2',
+            color: '#1b1b1b',
+          }}
+        >
+          <SearchIcon />
+        </IconButton>
+      )}
       <Drawer anchor="right" open={isOpen} onClose={toggleDrawer}>
         <Box
           sx={{
@@ -62,6 +71,15 @@ function Sidebar() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
           />
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+            onClick={handleSearch}
+          >
+            Buscar
+          </Button>
         </Box>
       </Drawer>
     </div>
