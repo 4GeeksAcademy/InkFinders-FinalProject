@@ -31,7 +31,7 @@ const SignUpForm = () => {
             fullWidth
             margin="normal"
             label="Email"
-            ame="email"
+            name="email"
             required
           />
           <TextField
